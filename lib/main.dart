@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:image_picker/image_picker.dart';
-
 void main() {
   runApp(const MyApp());
 }
@@ -141,12 +140,56 @@ class _MyHomePageState extends State<MyHomePage> {
                     scannedText,
                     style: TextStyle(fontSize: 20),
                   ),
-                )
+                ),
               ],
             )),
       )),
     );
+    
   }
+  String parseData(inputString){
+    //convert string to lower
+    var lower_string= inputString.toLowerCase();
+    var final_text= "";
+    //Doctor name
+    var start_index=lower_string.indexOf("dr");
+    var end_index=lower_string.indexOf("\n", start_index);
+    final_text= final_text + "Doctor Name: " + inputString.substring(start_index, end_index) + "\n";
+    print("Doctor Name: " + inputString.substring(start_index, end_index));
+    
+    //Hospital name
+    var hosp_keys = ["clinic", "hospital", "healthcare", "center", "medical" ];
+    
+    for( var k in hosp_keys){
+      var start_index=lower_string.indexOf(k);
+      if (start_index == -1)
+      {
+        continue;
+      }
+      var end_index=lower_string.lastIndexOf("\n", lower_string.indexOf("\n", start_index)-1)+1;
+      final_text= final_text+ "Hospital Name:" + inputString.substring(end_index, start_index+ k.length)+"\n";
+      print("Hospital Name:" + inputString.substring(end_index, start_index+ k.length));
+    }
+  
+  //Patient Name
+    var pat_keys= ["mr", "ms", "mrs", "name", "mr.", "mrs.", "ms.", "miss" ];
+    for( var k in pat_keys){
+        var start_index=lower_string.indexOf(k);
+        if (start_index == -1)
+        {
+          continue;
+        }
+      var end_index=lower_string.indexOf("\n", start_index);
+      final_text=final_text+"Patient Name: " + inputString.substring(start_index, end_index);
+      print("Patient Name: " + inputString.substring(start_index, end_index));
+      }
+      return final_text;
+    }
+
+  //Date
+  
+
+
 
   void getImage(ImageSource source) async {
     try {
@@ -174,14 +217,16 @@ class _MyHomePageState extends State<MyHomePage> {
     for (TextBlock block in recognisedText.blocks) {
       for (TextLine line in block.lines) {
         scannedText = scannedText + line.text + "\n";
+        
       }
     }
+    scannedText= parseData(scannedText);
     textScanning = false;
-    setState(() {});
+    setState(() {}); 
   }
 
   @override
   void initState() {
     super.initState();
   }
-}
+  }
